@@ -3,8 +3,19 @@ import { ApiTester } from "@/components/ApiTester"
 import { getUser } from "@/lib/auth"
 import { createServerSupabaseClient } from "@/lib/supabase"
 import { logout } from "@/app/actions/auth"
+import { redirect } from "next/navigation"
 
-export default async function Home() {
+export default async function Home(
+  props: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }
+) {
+  const searchParams = await props.searchParams
+
+  // ULTIMATE FAILSAFE: If Supabase strict-matching drops the user on the root with a code,
+  // we catch it and force it through the callback pipeline to solidify the session!
+  if (searchParams?.code) {
+    redirect(`/auth/callback?code=${searchParams.code}`)
+  }
+
   const user = await getUser()
   let profile = null
 

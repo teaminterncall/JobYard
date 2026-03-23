@@ -3,6 +3,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
 export async function login(formData: FormData) {
     const email = formData.get('email') as string
@@ -91,13 +92,16 @@ export async function logout() {
 export async function signInWithGoogle() {
     const supabase = await createServerSupabaseClient()
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const cleanUrl = siteUrl.replace(/\/$/, '')
+    // Bulletproof Dynamic Origin Extraction
+    const headersList = await headers()
+    const host = headersList.get('x-forwarded-host') || headersList.get('host')
+    const protocol = headersList.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https')
+    const origin = `${protocol}://${host}`
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${cleanUrl}/auth/callback`,
+            redirectTo: `${origin}/auth/callback`,
         },
     })
 
