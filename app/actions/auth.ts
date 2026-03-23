@@ -91,10 +91,13 @@ export async function logout() {
 export async function signInWithGoogle() {
     const supabase = await createServerSupabaseClient()
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const cleanUrl = siteUrl.replace(/\/$/, '')
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+            redirectTo: `${cleanUrl}/auth/callback`,
         },
     })
 
