@@ -5,7 +5,7 @@ import { rateLimit } from '@/lib/rate-limit'
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params
@@ -29,7 +29,7 @@ export async function GET(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1'
