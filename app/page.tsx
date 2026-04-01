@@ -1,93 +1,154 @@
-import Link from "next/link"
-import { ApiTester } from "@/components/ApiTester"
-import { getUser } from "@/lib/auth"
-import { createServerSupabaseClient } from "@/lib/supabase"
-import { logout } from "@/app/actions/auth"
-import { redirect } from "next/navigation"
+'use client';
 
-export default async function Home(
-  props: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }
-) {
-  const searchParams = await props.searchParams
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
-  // ULTIMATE FAILSAFE: If Supabase strict-matching drops the user on the root with a code,
-  // we catch it and force it through the callback pipeline to solidify the session!
-  if (searchParams?.code) {
-    redirect(`/auth/callback?code=${searchParams.code}`)
-  }
+export default function JobBoard() {
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1 });
+  const [loading, setLoading] = useState(true);
+  
+  const [location, setLocation] = useState('');
+  const [jobType, setJobType] = useState('');
 
-  const user = await getUser()
-  let profile = null
+  const fetchJobs = async (page = 1) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: page.toString(), limit: '10' });
+      if (location) params.append('location', location);
+      if (jobType) params.append('job_type', jobType);
 
-  if (user) {
-    const supabase = await createServerSupabaseClient()
-    const { data } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).single()
-    profile = data
-  }
+      const res = await fetch(`/api/jobs?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setJobs(data.jobs || []);
+        setPagination(data.pagination || { page: 1, limit: 10, totalPages: 1 });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs(1);
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchJobs(1);
+  };
 
   return (
-    <div className="flex min-h-screen flex-col font-sans bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100">
-      <header className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black relative z-10 px-6 py-4 flex items-center justify-between">
-        <div className="font-bold text-xl tracking-tight">JOB YARD</div>
-        <nav className="flex items-center gap-4">
-          {user ? (
-            <>
-              <span className="text-sm font-medium text-zinc-500">
-                Hi, {profile?.full_name || user.email} {profile?.role === 'admin' && '(Admin)'}
-              </span>
-              {profile?.role === 'admin' && (
-                <Link href="/admin" className="text-sm font-medium hover:text-blue-600 transition-colors">Dashboard</Link>
-              )}
-              <form action={logout}>
-                <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
-                  Logout
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link href="/auth/login" className="text-sm font-medium hover:text-blue-600 transition-colors">Sign In</Link>
-              <Link href="/auth/signup" className="text-sm font-medium hover:text-blue-600 transition-colors">Sign Up</Link>
-            </>
-          )}
-        </nav>
-      </header>
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Explore Opportunities</h1>
+        <p style={{ color: 'var(--text2)' }}>Find the perfect role that matches your skills.</p>
+      </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center">
-        <div className="max-w-3xl space-y-6">
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-            Find the right <span className="text-blue-600">gig</span>.
-            <br /> Build your career.
-          </h1>
-          <p className="text-lg md:text-xl text-zinc-600 dark:text-zinc-400">
-            Welcome to Job Yard. The best place to find top tech jobs, freelance gigs, and opportunities tailored for you.
-          </p>
-          <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {!user ? (
-              <Link
-                href="/auth/login"
-                className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors"
-              >
-                Get Started
-              </Link>
-            ) : (
-              <div className="px-8 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-medium rounded-full cursor-default">
-                You're Signed In!
-              </div>
-            )}
+      <div className="card" style={{ marginBottom: '2rem' }}>
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 200px' }}>
+            <label className="label">Location</label>
+            <input
+              type="text"
+              className="input-field"
+              placeholder="e.g. Remote, San Francisco"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
           </div>
-        </div>
+          <div style={{ flex: '1 1 200px' }}>
+            <label className="label">Job Type</label>
+            <select
+              className="input-field"
+              value={jobType}
+              onChange={(e) => setJobType(e.target.value)}
+              style={{ paddingRight: '2rem' }}
+            >
+              <option value="">Any Type</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+            <button type="submit" className="btn btn-primary" style={{ padding: '0.625rem 1.5rem', height: '42px' }}>
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
 
-        {/* API Tester UI Embedded Right In Home Page */}
-        <div className="mt-16 w-full max-w-3xl">
-          <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800 mb-8" />
-          <ApiTester />
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text2)' }}>Loading jobs...</div>
+      ) : jobs.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text2)' }}>
+          No jobs found matching your criteria.
         </div>
-      </main>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {jobs.map((job) => (
+            <div key={job.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>
+                    <Link href={`/jobs/${job.id}`} style={{ transition: 'color 0.2s' }}>
+                      {job.title}
+                    </Link>
+                  </h2>
+                  <div style={{ color: 'var(--text2)', fontSize: '0.875rem' }}>
+                    {job.company} • {job.location}
+                  </div>
+                </div>
+                {!job.is_active && (
+                  <span className="badge badge-info" style={{ color: 'var(--error)', backgroundColor: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.2)' }}>
+                    Closed
+                  </span>
+                )}
+              </div>
+              
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <span className="badge badge-info">{job.job_type}</span>
+                <span className="badge badge-orange">
+                  Posted {new Date(job.created_at).toLocaleDateString()}
+                </span>
+              </div>
+              
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <Link href={`/jobs/${job.id}`} className="btn btn-outline" style={{ display: 'inline-block' }}>
+                  View Details
+                </Link>
+              </div>
+            </div>
+          ))}
 
-      <footer className="w-full py-6 text-center text-sm text-zinc-500 border-t border-zinc-200 dark:border-zinc-800">
-        &copy; {new Date().getFullYear()} Job Yard. All rights reserved.
-      </footer>
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+              <button
+                className="btn btn-outline"
+                disabled={pagination.page <= 1}
+                onClick={() => fetchJobs(pagination.page - 1)}
+              >
+                Previous
+              </button>
+              <span style={{ fontSize: '0.875rem', color: 'var(--text2)' }}>
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <button
+                className="btn btn-outline"
+                disabled={pagination.page >= pagination.totalPages}
+                onClick={() => fetchJobs(pagination.page + 1)}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
-  )
+  );
 }
