@@ -45,37 +45,17 @@ export default function ResumesPage() {
     setError('');
 
     try {
-      const params = new URLSearchParams({ 
-        fileName: file.name, 
-        fileType: file.type, 
-        fileSize: file.size.toString() 
-      });
+      const formData = new FormData();
+      formData.append('file', file);
       
-      const urlRes = await fetch(`/api/resumes/upload-url?${params}`);
-      if (!urlRes.ok) {
-        const errorData = await urlRes.text();
-        throw new Error(`Failed to get upload URL: ${errorData}`);
-      }
-      const { signedUrl, path } = await urlRes.json();
-
-      const uploadRes = await fetch(signedUrl, { 
-        method: 'PUT', 
-        headers: { 'Content-Type': file.type }, 
-        body: file 
+      const uploadRes = await fetch('/api/resumes/upload', {
+        method: 'POST',
+        body: formData,
       });
 
       if (!uploadRes.ok) {
-        throw new Error('Failed to upload file to storage.');
-      }
-
-      const metaRes = await fetch('/api/resumes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file_path: path, file_size: file.size })
-      });
-
-      if (!metaRes.ok) {
-        throw new Error('Failed to save resume metadata.');
+        const errorData = await uploadRes.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
 
       // Refresh list
