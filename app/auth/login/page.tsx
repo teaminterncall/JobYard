@@ -1,28 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { login, signInWithGoogle } from '@/app/actions/auth'
+import { signInWithGoogle } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
-    const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        const formData = new FormData(e.currentTarget)
-        setLoading(true)
-        setError(null)
-
-        const result = await login(formData)
-
-        if (result?.error) {
-            setError(result.error)
-            setLoading(false)
-        }
-    }
-
     return (
         <div className="w-full max-w-md p-8 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800">
             <div className="mb-8 text-center">
@@ -32,57 +14,7 @@ export default function LoginPage() {
                 </p>
             </div>
 
-            {error && (
-                <div className="mb-4 p-3 rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
-                    {error}
-                </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        className="w-full p-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        placeholder="you@example.com"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium" htmlFor="password">Password</label>
-                        {/* Optional: Add forgot password link here */}
-                    </div>
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        required
-                        className="w-full p-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        placeholder="••••••••"
-                    />
-                </div>
-                <Button
-                    type="submit"
-                    className="w-full py-6 text-base mt-2"
-                    disabled={loading}
-                >
-                    {loading ? 'Signing In...' : 'Sign In'}
-                </Button>
-            </form>
-
-            <div className="my-6 relative">
-                <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-zinc-300 dark:border-zinc-700"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-zinc-900 text-zinc-500">Or continue with</span>
-                </div>
-            </div>
-
-            <form action={signInWithGoogle}>
+            <form action={signInWithGoogle} className="mt-8">
                 <Button
                     type="submit"
                     variant="outline"

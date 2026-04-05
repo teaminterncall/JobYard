@@ -28,6 +28,7 @@ export function Sidebar() {
 
   const navLinks = [
     { name: 'Job Board', href: '/' },
+    { name: 'Applications', href: '/applications' },
     { name: 'Profile', href: '/profile' },
     { name: 'Resumes', href: '/resumes' },
   ];

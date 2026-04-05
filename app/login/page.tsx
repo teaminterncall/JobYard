@@ -2,33 +2,10 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase-client';
-import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-    } else {
-      router.push('/');
-      router.refresh();
-    }
-  };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -54,41 +31,6 @@ export default function LoginPage() {
         </div>
 
         {error && <div style={{ color: 'var(--error)', backgroundColor: 'rgba(239,68,68,0.1)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</div>}
-
-        <form onSubmit={handleEmailLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div>
-            <label className="label">Email address</label>
-            <input
-              type="email"
-              required
-              className="input-field"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label className="label">Password</label>
-            <input
-              type="password"
-              required
-              className="input-field"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem' }}>
-            {loading ? 'Signing in...' : 'Sign In with Email'}
-          </button>
-        </form>
-
-        <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0', color: 'var(--text3)' }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }} />
-          <span style={{ margin: '0 1rem', fontSize: '0.75rem', textTransform: 'uppercase' }}>or</span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }} />
-        </div>
 
         <button
           onClick={handleGoogleLogin}
