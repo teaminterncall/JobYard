@@ -102,6 +102,26 @@ export default function ResumesPage() {
     }
   };
 
+  const handleDelete = async (resumeId: string) => {
+    if (!confirm('Are you sure you want to delete this resume?')) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/resumes/${resumeId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        await fetchResumes();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.error || 'Failed to delete resume');
+        setLoading(false);
+      }
+    } catch (err) {
+      alert('Error deleting resume');
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
@@ -165,13 +185,22 @@ export default function ResumesPage() {
                   </div>
                 </div>
                 
-                <button 
-                  className="btn btn-outline" 
-                  style={{ width: '100%' }}
-                  onClick={() => handleDownload(resume.id)}
-                >
-                  Download
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                  <button 
+                    className="btn btn-outline" 
+                    style={{ flex: 1 }}
+                    onClick={() => handleDownload(resume.id)}
+                  >
+                    Download
+                  </button>
+                  <button 
+                    className="btn btn-danger" 
+                    style={{ flex: 1 }}
+                    onClick={() => handleDelete(resume.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

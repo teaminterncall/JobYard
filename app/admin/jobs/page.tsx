@@ -88,7 +88,14 @@ export default function AdminJobsPage() {
         await loadJobs();
       } else {
         const data = await res.json();
-        setError(JSON.stringify(data.error || 'Failed to create job'));
+        if (data.details) {
+          const errorMessages = Object.entries(data.details)
+            .filter(([key]) => key !== '_errors')
+            .map(([key, val]: any) => `${key}: ${val._errors?.join(', ')}`);
+          setError(`Validation Error: ${errorMessages.join(' | ')}`);
+        } else {
+          setError(data.error || 'Failed to create job');
+        }
       }
     } catch (err) {
       setError('Network error creating job.');
