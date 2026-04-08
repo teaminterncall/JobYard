@@ -138,7 +138,7 @@ export default function ProfilePage() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
             <div style={{ flex: 1 }}>
               <label className="label">Degree</label>
               <input

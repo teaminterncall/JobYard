@@ -12,6 +12,7 @@ export default function JobDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -22,6 +23,7 @@ export default function JobDetailsPage() {
         ]);
 
         if (profileRes && profileRes.ok) {
+          setIsLoggedIn(true);
           const profileData = await profileRes.json();
           if (profileData.profile?.role === 'admin') setIsAdmin(true);
         }
@@ -86,9 +88,19 @@ export default function JobDetailsPage() {
                 </Link>
               )}
               {job.is_active ? (
-                <a href={job.apply_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.75rem 2rem' }}>
+                <button 
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      window.open(job.apply_url, '_blank', 'noopener,noreferrer');
+                    } else {
+                      router.push(`/login?next=/jobs/${id}`);
+                    }
+                  }}
+                  className="btn btn-primary" 
+                  style={{ padding: '0.75rem 2rem' }}
+                >
                   Apply Now
-                </a>
+                </button>
               ) : (
                 <button className="btn btn-outline" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                   No Longer Accepting Applications

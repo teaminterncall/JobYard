@@ -11,7 +11,7 @@ export default function AdminJobsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [editingJobId, setEditingJobId] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     company: '',
@@ -141,7 +141,7 @@ export default function AdminJobsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this job?')) return;
-    
+
     try {
       const res = await fetch(`/api/jobs/${id}`, {
         method: 'DELETE'
@@ -178,7 +178,7 @@ export default function AdminJobsPage() {
             <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: 700 }}>
               {editingJobId ? 'Edit Job' : 'Post New Job'}
             </h2>
-            
+
             {error && (
               <div style={{ padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', backgroundColor: 'rgba(239,68,68,0.1)', color: 'var(--error)' }}>
                 {error}
@@ -252,7 +252,7 @@ export default function AdminJobsPage() {
         <div style={{ flex: '2 1 500px' }}>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: 700 }}>Existing Listings</h2>
-            
+
             {jobs.length === 0 ? (
               <p style={{ color: 'var(--text2)' }}>No jobs found.</p>
             ) : (
@@ -267,23 +267,23 @@ export default function AdminJobsPage() {
                         {job.company} • {job.is_active ? 'Active' : 'Closed'}
                       </p>
                     </div>
-                    
+
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button 
+                      <button
                         className="btn btn-outline"
                         style={{ fontSize: '0.75rem', padding: '0.4rem 0.6rem' }}
                         onClick={() => handleEdit(job)}
                       >
                         Edit
                       </button>
-                      <button 
+                      <button
                         className={`btn ${job.is_active ? 'btn-danger' : 'btn-outline'}`}
                         style={{ fontSize: '0.75rem', padding: '0.4rem 0.6rem' }}
                         onClick={() => toggleJobStatus(job.id, job.is_active)}
                       >
                         {job.is_active ? 'Close' : 'Re-open'}
                       </button>
-                      <button 
+                      <button
                         className="btn btn-danger"
                         style={{ fontSize: '0.75rem', padding: '0.4rem 0.6rem' }}
                         onClick={() => handleDelete(job.id)}

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase-client';
 
-export function Sidebar() {
+export function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIsOpen?: (val: boolean) => void }) {
   const pathname = usePathname();
   const [role, setRole] = useState<'user' | 'admin' | null>(null);
 
@@ -38,14 +38,29 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="sidebar">
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-syne)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Eviternship /
-          <br />
-          <span style={{ color: 'var(--orange)' }}>Job YARD</span>
-        </h1>
-      </div>
+    <>
+      <div 
+        className={`sidebar-overlay ${isOpen ? 'open' : ''}`} 
+        onClick={() => setIsOpen?.(false)}
+      />
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <h1 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-syne)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Eviternship /
+            <br />
+            <span style={{ color: 'var(--orange)' }}>Job YARD</span>
+          </h1>
+          <button 
+            className="hamburger-btn" 
+            onClick={() => setIsOpen?.(false)}
+            aria-label="Close menu"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {navLinks.map((link) => {
@@ -54,6 +69,7 @@ export function Sidebar() {
             <Link
               key={link.name}
               href={link.href}
+              onClick={() => setIsOpen?.(false)}
               style={{
                 padding: '0.75rem 1rem',
                 borderRadius: '8px',
@@ -68,6 +84,7 @@ export function Sidebar() {
           );
         })}
       </nav>
-    </aside>
+      </aside>
+    </>
   );
 }
