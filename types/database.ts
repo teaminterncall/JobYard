@@ -81,6 +81,7 @@ export interface Database {
                     graduation_year: number | null
                     bio: string | null
                     role: string
+                    email: string | null
                 }
                 Insert: {
                     id: string
@@ -92,6 +93,7 @@ export interface Database {
                     graduation_year?: number | null
                     bio?: string | null
                     role?: string
+                    email?: string | null
                 }
                 Update: {
                     id?: string
@@ -103,6 +105,7 @@ export interface Database {
                     graduation_year?: number | null
                     bio?: string | null
                     role?: string
+                    email?: string | null
                 }
             }
         }
