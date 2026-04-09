@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase-client';
 
-export function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIsOpen?: (val: boolean) => void }) {
+export function Sidebar({ isOpen, setIsOpen, isComplete }: { isOpen?: boolean, setIsOpen?: (val: boolean) => void, isComplete?: boolean | null }) {
   const pathname = usePathname();
   const [role, setRole] = useState<'user' | 'admin' | null>(null);
 
@@ -31,6 +31,12 @@ export function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIsOpen?: (
     { name: 'Applications', href: '/applications' },
     { name: 'Profile', href: '/profile' },
     { name: 'Resumes', href: '/resumes' },
+    { name: 'Referrals', href: '/referrals' },
+    { name: 'Resources', href: '/resources' },
+    { name: 'Mock Interviews', href: '/mock-interviews' },
+    { name: 'Weekend Sessions', href: '/weekend-sessions' },
+    { name: 'Resume Score', href: '/resume-score' },
+    { name: 'Placement Exams', href: '/placement-exams' },
   ];
 
   if (role === 'admin') {
@@ -65,11 +71,16 @@ export function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIsOpen?: (
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {navLinks.map((link) => {
           const isActive = pathname === link.href || (link.href !== '/' && pathname?.startsWith(link.href));
+          const isDisabled = isComplete === false && link.href !== '/profile';
+          
           return (
             <Link
               key={link.name}
-              href={link.href}
-              onClick={() => setIsOpen?.(false)}
+              href={isDisabled ? '/profile' : link.href}
+              onClick={(e) => {
+                if (isDisabled) e.preventDefault();
+                else setIsOpen?.(false);
+              }}
               style={{
                 padding: '0.75rem 1rem',
                 borderRadius: '8px',
@@ -77,9 +88,11 @@ export function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIsOpen?: (
                 color: isActive ? 'white' : 'var(--text2)',
                 backgroundColor: isActive ? 'var(--orange)' : 'transparent',
                 transition: 'all 0.2s ease',
+                pointerEvents: isDisabled ? 'none' : 'auto',
+                opacity: isDisabled ? 0.5 : 1,
               }}
             >
-              {link.name}
+              {link.name} {isDisabled && <span style={{ marginLeft: '0.5rem', fontSize: '0.9em' }}>🔒</span>}
             </Link>
           );
         })}

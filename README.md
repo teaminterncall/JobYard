@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JobYard
 
-## Getting Started
+JobYard is a comprehensive job board and application tracking platform built with Next.js and Supabase. It provides both a public-facing job board and a suite of personal tools for candidates to manage their hiring journey.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Authentication & User Management
+* **Single Sign-On (SSO):** A streamlined login page exclusively running on Google OAuth. 
+* **Automated Profile Generation:** Background database triggers automatically create and link your user data (such as emails) the moment a new user logs in.
+* **User Profiles:** A dashboard where users can view and update their personal details, phone numbers, college information, degree, graduation year, and a customized bio.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Job Board & Administration
+* **Public Job Board:** The main interface allowing users to view all available open roles.
+* **Admin Dashboard:** An administrative control panel that allows privileged users to manage job postings:
+  * Create new job postings (Company, Location, Description, Types).
+  * Edit existing job listings.
+  * Delete postings securely.
+  * Toggle listings to inactive or set expiration dates. 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Resume Management System
+* **Resume Uploads:** Users can securely upload their resumes to their account.
+* **Format & Size Protection:** Built-in safeguards ensure users only upload valid document types (PDF/DOCX) and keep them under a 5MB threshold.
+* **Secure Storage:** Uses Supabase Storage to keep resumes organized and handles generating secure download URLs.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Job Applications Tracker
+* **Tracking Dashboard:** A customized tracker where users can log applications they submit externally or natively.
+* **Application Metadata:** Allows tracking of specific details per application, such as Company Name, Role, Platform, Application Links, Status tracking (Applied/Interviewing/Rejected), and custom personal Notes.
 
-## Learn More
+## Tech Stack
+* **Framework:** Next.js App Router
+* **Database & File Storage:** Supabase (combining Postgres SQL, Auth, and Storage Buckets)
+* **Security:** Strict user isolation and automatic cascading data cleanup via PostgreSQL foreign key constraints.
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

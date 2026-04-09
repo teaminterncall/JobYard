@@ -13,6 +13,7 @@ export default function JobDetailsPage() {
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -26,6 +27,10 @@ export default function JobDetailsPage() {
           setIsLoggedIn(true);
           const profileData = await profileRes.json();
           if (profileData.profile?.role === 'admin') setIsAdmin(true);
+          
+          const p = profileData.profile;
+          const isComplete = Boolean(p && p.full_name && p.phone && p.college && p.degree && p.graduation_year);
+          setIsProfileComplete(isComplete);
         }
 
         if (jobRes.ok) {
@@ -91,7 +96,12 @@ export default function JobDetailsPage() {
                 <button 
                   onClick={() => {
                     if (isLoggedIn) {
-                      window.open(job.apply_url, '_blank', 'noopener,noreferrer');
+                      if (!isProfileComplete) {
+                        alert('Please complete your profile details before applying.');
+                        router.push('/profile');
+                      } else {
+                        window.open(job.apply_url, '_blank', 'noopener,noreferrer');
+                      }
                     } else {
                       router.push(`/login?next=/jobs/${id}`);
                     }
