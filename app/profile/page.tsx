@@ -67,6 +67,7 @@ export default function ProfilePage() {
 
       if (res.ok) {
         setMessage({ text: 'Profile updated successfully!', type: 'success' });
+        window.dispatchEvent(new Event('profileUpdated'));
       } else if (res.status === 400) {
         const data = await res.json();
         setMessage({ text: `Validation Error: ${JSON.stringify(data.error || data)}`, type: 'error' });

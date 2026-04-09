@@ -47,6 +47,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
     
     checkProfile();
+
+    window.addEventListener('profileUpdated', checkProfile);
+    return () => window.removeEventListener('profileUpdated', checkProfile);
   }, [pathname, router]);
 
   if (noLayoutRoutes.includes(pathname || '')) {
