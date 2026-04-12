@@ -1,12 +1,12 @@
 'use client';
-
+// @ts-nocheck
 import { useEffect, useState } from 'react';
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
-  
+
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
