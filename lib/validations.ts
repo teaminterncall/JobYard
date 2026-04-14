@@ -30,7 +30,24 @@ export const resumeSchema = z.object({
     file_size: z.number().int().positive("File size must be positive.").max(5 * 1024 * 1024, "File size limit is 5MB."),
 })
 
+export const resourceSchema = z.object({
+    title: z.string().min(2, "Title must be at least 2 characters."),
+    description: z.string().min(10, "Description should be more detailed."),
+    category: z.enum(["Roadmap", "Interview Prep", "System Design", "General"]),
+    link_url: z.string().url("Please provide a valid URL for the resource."),
+    is_active: z.boolean().optional(),
+})
+
+export const weekendSessionSchema = z.object({
+    name: z.string().min(2, "Session name must be at least 2 characters."),
+    description: z.string().min(10, "Description should be more detailed."),
+    link_url: z.string().url("Please provide a valid URL for the session."),
+    is_active: z.boolean().optional(),
+})
+
 export type AuthInput = z.infer<typeof authSchema>
 export type JobInput = z.infer<typeof jobSchema>
 export type ProfileInput = z.infer<typeof profileSchema>
 export type ResumeInput = z.infer<typeof resumeSchema>
+export type ResourceInput = z.infer<typeof resourceSchema>
+export type WeekendSessionInput = z.infer<typeof weekendSessionSchema>

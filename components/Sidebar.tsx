@@ -40,7 +40,11 @@ export function Sidebar({ isOpen, setIsOpen, isComplete }: { isOpen?: boolean, s
   ];
 
   if (role === 'admin') {
-    navLinks.push({ name: 'Admin Jobs', href: '/admin/jobs' });
+    navLinks.push(
+      { name: 'Admin Jobs', href: '/admin/jobs' },
+      { name: 'Admin Resources', href: '/admin/resources' },
+      { name: 'Admin Weekend Sessions', href: '/admin/weekend-sessions' }
+    );
   }
 
   return (
