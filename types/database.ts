@@ -47,6 +47,38 @@ export interface Database {
                     is_active?: boolean
                 }
             }
+            resources: {
+                Row: {
+                    id: string
+                    created_at: string
+                    title: string
+                    description: string
+                    category: string
+                    link_url: string | null
+                    pdf_path: string | null
+                    is_active: boolean
+                }
+                Insert: {
+                    id?: string
+                    created_at?: string
+                    title: string
+                    description: string
+                    category: string
+                    link_url?: string | null
+                    pdf_path?: string | null
+                    is_active?: boolean
+                }
+                Update: {
+                    id?: string
+                    created_at?: string
+                    title?: string
+                    description?: string
+                    category?: string
+                    link_url?: string | null
+                    pdf_path?: string | null
+                    is_active?: boolean
+                }
+            }
             resumes: {
                 Row: {
                     id: string

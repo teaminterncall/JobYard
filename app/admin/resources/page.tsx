@@ -11,12 +11,14 @@ export default function AdminResourcesPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [editingResourceId, setEditingResourceId] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
     category: 'Roadmap',
     description: '',
     link_url: '',
+    pdf_path: '',
     is_active: true
   });
 
@@ -61,13 +63,55 @@ export default function AdminResourcesPage() {
     setFormData({ ...formData, [e.target.name]: value });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    } else {
+      setFile(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError('');
 
     try {
-      const payload = { ...formData };
+      let uploadedPdfPath = formData.pdf_path;
+
+      if (file) {
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+        const uploadRes = await fetch('/api/resources/upload', {
+          method: 'POST',
+          body: uploadData,
+        });
+
+        if (!uploadRes.ok) {
+          const ud = await uploadRes.json();
+          setError(ud.error || 'Failed to upload PDF');
+          setSaving(false);
+          return;
+        }
+
+        const ud = await uploadRes.json();
+        uploadedPdfPath = ud.pdf_path;
+      }
+
+      if (!formData.link_url && !uploadedPdfPath) {
+        setError("You must provide either a Resource Link or upload a PDF.");
+        setSaving(false);
+        return;
+      }
+
+      const payload = {
+        title: formData.title,
+        category: formData.category,
+        description: formData.description,
+        is_active: formData.is_active,
+        link_url: formData.link_url || null,
+        pdf_path: uploadedPdfPath || null,
+      };
 
       const url = editingResourceId ? `/api/resources/${editingResourceId}` : '/api/resources';
       const method = editingResourceId ? 'PUT' : 'POST';
@@ -79,7 +123,11 @@ export default function AdminResourcesPage() {
       });
 
       if (res.ok) {
-        setFormData({ title: '', category: 'Roadmap', description: '', link_url: '', is_active: true });
+        setFormData({ title: '', category: 'Roadmap', description: '', link_url: '', pdf_path: '', is_active: true });
+        setFile(null);
+        if (document.getElementById('file-input')) {
+          (document.getElementById('file-input') as HTMLInputElement).value = '';
+        }
         setEditingResourceId(null);
         await loadResources();
       } else {
@@ -121,9 +169,14 @@ export default function AdminResourcesPage() {
       title: resource.title,
       category: resource.category,
       description: resource.description,
-      link_url: resource.link_url,
+      link_url: resource.link_url || '',
+      pdf_path: resource.pdf_path || '',
       is_active: resource.is_active
     });
+    setFile(null);
+    if (document.getElementById('file-input')) {
+      (document.getElementById('file-input') as HTMLInputElement).value = '';
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -146,7 +199,11 @@ export default function AdminResourcesPage() {
 
   const cancelEdit = () => {
     setEditingResourceId(null);
-    setFormData({ title: '', category: 'Roadmap', description: '', link_url: '', is_active: true });
+    setFormData({ title: '', category: 'Roadmap', description: '', link_url: '', pdf_path: '', is_active: true });
+    setFile(null);
+    if (document.getElementById('file-input')) {
+      (document.getElementById('file-input') as HTMLInputElement).value = '';
+    }
   };
 
   if (loading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text2)' }}>Checking permissions...</div>;
@@ -191,7 +248,17 @@ export default function AdminResourcesPage() {
 
               <div>
                 <label className="label">Resource Link (URL)</label>
-                <input type="url" name="link_url" required className="input-field" value={formData.link_url} onChange={handleChange} />
+                <input type="url" name="link_url" className="input-field" value={formData.link_url} onChange={handleChange} placeholder="Optional if uploading PDF" />
+              </div>
+
+              <div>
+                <label className="label">Upload PDF</label>
+                <input id="file-input" type="file" accept=".pdf" className="input-field" onChange={handleFileChange} />
+                {formData.pdf_path && !file && (
+                   <p style={{ fontSize: '0.8rem', color: 'var(--text2)', marginTop: '0.25rem' }}>
+                     Current PDF: {formData.pdf_path.split('/').pop()}
+                   </p>
+                )}
               </div>
 
               <div>
@@ -237,7 +304,8 @@ export default function AdminResourcesPage() {
                         {resource.title}
                       </h3>
                       <p style={{ fontSize: '0.875rem', color: 'var(--text2)', margin: 0 }}>
-                        {resource.category} • {resource.is_active ? 'Active' : 'Hidden'}
+                        {resource.category} • {resource.is_active ? 'Active' : 'Hidden'} 
+                        {' '}• {resource.link_url && resource.pdf_path ? 'Link & PDF' : resource.pdf_path ? 'PDF Only' : 'Link Only'}
                       </p>
                     </div>
 

@@ -34,8 +34,12 @@ export const resourceSchema = z.object({
     title: z.string().min(2, "Title must be at least 2 characters."),
     description: z.string().min(10, "Description should be more detailed."),
     category: z.enum(["Roadmap", "Interview Prep", "System Design", "General"]),
-    link_url: z.string().url("Please provide a valid URL for the resource."),
+    link_url: z.string().url("Please provide a valid URL for the resource.").optional().nullable(),
+    pdf_path: z.string().optional().nullable(),
     is_active: z.boolean().optional(),
+}).refine(data => data.link_url || data.pdf_path, {
+    message: "You must provide either a link URL or upload a PDF.",
+    path: ["link_url"]
 })
 
 export const weekendSessionSchema = z.object({
