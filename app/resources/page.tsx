@@ -134,22 +134,18 @@ export default function ResourcesPage() {
               </div>
               
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                {resource.link_url && (
-                  <button 
-                    onClick={() => handleAccessResource(resource.link_url)} 
-                    className={`btn ${resource.pdf_path ? 'btn-outline' : 'btn-primary'}`}
-                  >
-                    Access Link
-                  </button>
-                )}
-                {resource.pdf_path && (
-                  <button 
-                    onClick={() => handleAccessResource(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/resources/${resource.pdf_path}`)} 
-                    className="btn btn-primary"
-                  >
-                    Read PDF
-                  </button>
-                )}
+                <button 
+                  onClick={() => {
+                    if (resource.pdf_path) {
+                      handleAccessResource(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/resources/${resource.pdf_path}`);
+                    } else if (resource.link_url) {
+                      handleAccessResource(resource.link_url);
+                    }
+                  }} 
+                  className="btn btn-primary"
+                >
+                  {resource.pdf_path ? 'Read PDF' : 'Access Link'}
+                </button>
               </div>
             </div>
           ))}

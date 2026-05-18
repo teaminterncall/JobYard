@@ -72,7 +72,7 @@ export function Sidebar({ isOpen, setIsOpen, isComplete }: { isOpen?: boolean, s
           </button>
         </div>
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', flex: 1, paddingRight: '0.25rem' }}>
         {navLinks.map((link) => {
           const isActive = pathname === link.href || (link.href !== '/' && pathname?.startsWith(link.href));
           const isDisabled = isComplete === false && link.href !== '/profile';

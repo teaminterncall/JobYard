@@ -3,6 +3,9 @@ import { createServerSupabaseClient } from '@/lib/supabase';
 import { resourceSchema } from '@/lib/validations';
 import { rateLimit } from '@/lib/rate-limit';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/resources -> filters: page, limit, category
 export async function GET(request: Request) {
     try {
@@ -13,10 +16,22 @@ export async function GET(request: Request) {
 
         const supabase = await createServerSupabaseClient();
 
+        let isAdmin = false;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+            if (profile?.role === 'admin') {
+                isAdmin = true;
+            }
+        }
+
         let query = supabase
             .from('resources')
-            .select('*', { count: 'exact' })
-            .eq('is_active', true);
+            .select('*', { count: 'exact' });
+
+        if (!isAdmin) {
+            query = query.eq('is_active', true);
+        }
 
         // Applying Filters
         if (category) {

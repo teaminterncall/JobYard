@@ -153,6 +153,21 @@ input, textarea, select, button {
   flex-direction: column;
 }
 
+/* Sidebar Navigation Scrollbar */
+.sidebar nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar nav::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 2px;
+}
+.sidebar nav::-webkit-scrollbar-thumb:hover {
+  background: var(--text3);
+}
+
 .main-content {
   flex: 1;
   margin-left: 240px;
